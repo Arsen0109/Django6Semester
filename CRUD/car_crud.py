@@ -3,19 +3,20 @@ import tkinter.messagebox as messagebox
 import mysql.connector
 
 
-class Car():
+class Car:
     def __init__(self, make, model_id, year, price, trademark_id):
         self.make = make
         self.model_id = model_id
         self.year = year
         self.price = price
         self.trademark_id = trademark_id
+        self.car_id = None
 
     def __str__(self):
-        return f"{self.make} {self.model_id} {self.year} {self.price} {self.trademark_id}"
+        return f"{self.car_id} {self.make} {self.model_id} {self.year} {self.price} {self.trademark_id}"
 
 
-class CarDB():
+class CarDB:
     def __init__(self):
         self.conn = mysql.connector.connect(host='localhost', user='root', password='@rsen2003', db='cartrademark')
         self.mysql_cursor = self.conn.cursor()
@@ -52,8 +53,9 @@ class CarDB():
             return None
 
     def update_car(self, car, car_id):
-        self.mysql_cursor.execute(f"UPDATE cars SET make={car.make}, model_id={car.model_id} ,year={car.year}, "
-                                  f"price={car.price}, trademark_id={car.trademark_id} WHERE car_id={car_id}")
+        self.mysql_cursor.execute(f"UPDATE cars SET make=%s, model_id=%s, year=%s,"
+                                  f" price=%s, trademark_id=%s WHERE car_id=%s",
+                                  (car.make, car.model_id, car.year, car.price, car.trademark_id, car_id))
         self.conn.commit()
 
     def delete_car(self, car_id):
@@ -103,7 +105,7 @@ class CarAdmin:
         self.car_id_entry.grid(row=7, column=1)
 
         self.car_listbox.grid(row=8, column=0, columnspan=2)
-        # self.car_listbox.bind("<<ListboxSelect>>", self.on_select_car)
+        self.car_listbox.bind("<<ListboxSelect>>", self.on_select_car)
 
         get_button = tk.Button(self.master, text="Get Car", command=self.show_car_by_id)
         get_button.grid(row=7, column=2)
@@ -123,6 +125,7 @@ class CarAdmin:
         self.info_label.grid(row=10, column=1)
 
     def fill_car_listbox(self):
+        self.car_listbox.delete(0, tk.END)
         for car in CarDB().get_all_cars():
             self.car_listbox.insert(0, car)
 
@@ -152,7 +155,6 @@ class CarAdmin:
         car = Car(make, model_id, year, price, trademark_id)
         if make and year and price and model_id and trademark_id:
             CarDB().add_car(car)
-            self.car_listbox.insert(tk.END, car)
             self.clear_form()
             self.info_label["text"] = "Car successfully added to database"
             self.info_label["fg"] = "Green"
@@ -167,32 +169,40 @@ class CarAdmin:
             self.info_label["fg"] = "Yellow"
         else:
             messagebox.showerror("Error", "All fields are required.")
+        self.fill_car_listbox()
 
     def update_car(self):
         car_id = self.car_id_entry.get()
         if car_id:
-            index = self.car_listbox.get(0, tk.END).index(str(CarDB().get_car_by_id(car_id)))
-            self.car_listbox.delete(index)
             make = self.make_entry.get()
             model_id = self.model_id_entry.get()
             year = self.year_entry.get()
             price = self.price_entry.get()
             trademark_id = self.trademark_id_entry.get()
             if make and price and year:
-                car = Car(make, model_id, year, price, trademark_id)
-                CarDB().update_car(car_id, car)
+                car = Car(make, model_id or None, year, price, trademark_id or None)
+                car.car_id = car_id
+                index = self.car_listbox.get(0, tk.END).index(str(CarDB().get_car_by_id(car_id)))
+                self.car_listbox.delete(index)
+                CarDB().update_car(car, car_id)
                 self.car_listbox.insert(0, car)
                 self.clear_form()
+                self.info_label["text"] = "Car successfully updated"
+                self.info_label["fg"] = "Green"
             else:
                 messagebox.showerror("Error", "At least make year and price fields are required.")
         else:
-            messagebox.showerror("Error", "Field ca_id is required.")
+            messagebox.showerror("Error", "Field car_id is required.")
 
     def delete_car(self):
-        index = self.car_listbox.curselection()
-        if index:
+        car_id = self.car_id_entry.get()
+        if car_id:
+            index = self.car_listbox.get(0, tk.END).index(str(CarDB().get_car_by_id(car_id)))
             self.car_listbox.delete(index)
+            CarDB().delete_car(car_id)
             self.clear_form()
+            self.info_label["text"] = "Car successfully deleted from database"
+            self.info_label["fg"] = "Green"
         else:
             messagebox.showerror("Error", "Please select a car to delete.")
 
@@ -200,24 +210,30 @@ class CarAdmin:
         self.make_entry.delete(0, tk.END)
         self.model_id_entry.delete(0, tk.END)
         self.year_entry.delete(0, tk.END)
+        self.price_entry.delete(0, tk.END)
+        self.trademark_id_entry.delete(0, tk.END)
 
-    # def on_select_car(self, event):
-    #     index = self.car_listbox.curselection()
-    #     if index:
-    #         car = self.car_listbox.get(index)
-    #         make, model, year = self.parse_car(car)
-    #         self.make_entry.delete(0, tk.END)
-    #         self.make_entry.insert(0, make)
-    #         self.model_id_entry.delete(0, tk.END)
-    #         self.model_id_entry.insert(0, model)
-    #         self.year_entry.delete(0, tk.END)
-    #         self.year_entry.insert(0, year)
-    #
-    # def parse_car(self, car):
-    #     make_model, year = car.split("(")
-    #     make, model = make_model.strip().split()
-    #     year = year.strip(")").strip()
-    #     return make, model, year
+    def on_select_car(self, event):
+        index = self.car_listbox.curselection()
+        if index:
+            car = self.car_listbox.get(index)
+            car_id, make, model_id, year, price, trademark_id = self.parse_car(car)
+            self.make_entry.delete(0, tk.END)
+            self.make_entry.insert(0, make)
+            self.model_id_entry.delete(0, tk.END)
+            self.model_id_entry.insert(0, model_id)
+            self.year_entry.delete(0, tk.END)
+            self.year_entry.insert(0, year)
+            self.price_entry.delete(0, tk.END)
+            self.price_entry.insert(0, price)
+            self.trademark_id_entry.delete(0, tk.END)
+            self.trademark_id_entry.insert(0, trademark_id)
+            self.car_id_entry.delete(0, tk.END)
+            self.car_id_entry.insert(0, car_id)
+
+    def parse_car(self, car):
+        car_id, make, model_id, year, price, trademark_id = car.split(" ")
+        return car_id, make, model_id, year, price, trademark_id
 
 
 
