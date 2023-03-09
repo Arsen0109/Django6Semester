@@ -1,5 +1,5 @@
 from tkinter import *
-from CRUD import car_crud, trademark_crud
+from CRUD import car_crud, trademark_crud, model_crud
 import psycopg2
 import mysql.connector
 
@@ -14,6 +14,12 @@ def call_trademark_crud():
     trademark_crud_interface = Tk()
     trademark_crud.TrademarkAdmin(trademark_crud_interface)
     trademark_crud_interface.mainloop()
+
+
+def call_model_crud():
+    model_crud_interface = Tk()
+    model_crud.ModelAdmin(model_crud_interface)
+    model_crud_interface.mainloop()
 
 
 def transfer_data_to_mysql():
@@ -94,7 +100,8 @@ class AdminInterface:
                                             command=call_trademark_crud)
         trademark_interface_button.grid(row=1, column=0)
 
-        model_interface_button = Button(self.master, text="Model CRUD interface", width=20, height=3)
+        model_interface_button = Button(self.master, text="Model CRUD interface", width=20, height=3,
+                                        command=call_model_crud)
         model_interface_button.grid(row=2, column=0)
 
         transfer_db_button = Button(self.master, text="Transfer from MySQL to PostgreSQL", width=30, height=3,

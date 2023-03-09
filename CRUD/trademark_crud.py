@@ -103,7 +103,7 @@ class TrademarkAdmin:
             self.trademark_entry.delete(0, tk.END)
             self.trademark_entry.insert(0, trademark.trademark_name)
             self.trademark_id_entry.delete(0, tk.END)
-            self.trademark_id_entry.insert(0, trademark.trademark_id or '')
+            self.trademark_id_entry.insert(0, trademark.trademark_id)
         else:
             messagebox.showerror("Error", "Field car_id is empty.")
 
@@ -134,7 +134,7 @@ class TrademarkAdmin:
                 self.info_label["text"] = "Trademark successfully updated"
                 self.info_label["fg"] = "Green"
             else:
-                messagebox.showerror("Error", "At least make year and price fields are required.")
+                messagebox.showerror("Error", "At least trademark field is required.")
         else:
             messagebox.showerror("Error", "Field car_id is required.")
 
@@ -148,7 +148,7 @@ class TrademarkAdmin:
             self.info_label["text"] = "Car successfully deleted from database"
             self.info_label["fg"] = "Green"
         else:
-            messagebox.showerror("Error", "Please select a car to delete.")
+            messagebox.showerror("Error", "Please select a trademark to delete.")
 
     def clear_form(self):
         self.trademark_entry.delete(0, tk.END)

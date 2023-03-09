@@ -157,16 +157,16 @@ class CarAdmin:
             CarDB().add_car(car)
             self.clear_form()
             self.info_label["text"] = "Car successfully added to database"
-            self.info_label["fg"] = "Green"
+            self.info_label["bg"] = "Green"
         elif make and year and price:
             car.model_id = None
             car.trademark_id = None
             CarDB().add_car(car)
             self.car_listbox.insert(tk.END, car)
             self.clear_form()
-            self.info_label["text"] = "Foreign keys are missing, added car without foreign key \n please update" \
-                                      " it later or delete"
-            self.info_label["fg"] = "Yellow"
+            self.info_label["text"] = "Warning foreign keys are missing, added car without foreign keys" \
+                                      " \n please update it later or delete"
+            self.info_label["bg"] = "Yellow"
         else:
             messagebox.showerror("Error", "All fields are required.")
         self.fill_car_listbox()
@@ -188,7 +188,7 @@ class CarAdmin:
                 self.car_listbox.insert(0, car)
                 self.clear_form()
                 self.info_label["text"] = "Car successfully updated"
-                self.info_label["fg"] = "Green"
+                self.info_label["bg"] = "Green"
             else:
                 messagebox.showerror("Error", "At least make year and price fields are required.")
         else:
@@ -202,7 +202,7 @@ class CarAdmin:
             CarDB().delete_car(car_id)
             self.clear_form()
             self.info_label["text"] = "Car successfully deleted from database"
-            self.info_label["fg"] = "Green"
+            self.info_label["bg"] = "Green"
         else:
             messagebox.showerror("Error", "Please select a car to delete.")
 
@@ -212,6 +212,7 @@ class CarAdmin:
         self.year_entry.delete(0, tk.END)
         self.price_entry.delete(0, tk.END)
         self.trademark_id_entry.delete(0, tk.END)
+        self.car_id_entry.delete(0, tk.END)
 
     def on_select_car(self, event):
         index = self.car_listbox.curselection()
