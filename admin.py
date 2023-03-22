@@ -2,6 +2,7 @@ from tkinter import *
 from CRUD import car_crud, trademark_crud, model_crud
 import psycopg2
 import mysql.connector
+import sqlite3
 
 
 def call_car_crud():
@@ -85,6 +86,42 @@ def transfer_data_to_mysql():
     postgres_conn.close()
 
 
+def transfer_data_to_sqlite():
+    postgres_conn = psycopg2.connect(host='localhost', user='postgres', password='@rsen2003', dbname='cartrademarks')
+    sqlite_conn = sqlite3.connect('cartrademarks.db')
+
+    postgres_cursor = postgres_conn.cursor()
+    sqlite_cursor = sqlite_conn.cursor()
+
+    sqlite_cursor.execute("DROP TABLE IF EXISTS cars")
+    sqlite_conn.commit()
+
+    sqlite_cursor.execute("CREATE TABLE IF NOT EXISTS cars(car_id INT PRIMARY KEY, model VARCHAR(40),"
+                          "price INT)")
+    sqlite_conn.commit()
+
+    # Retrieve data from tables and join it
+    postgres_cursor.execute("SELECT cars.car_id, models.model, cars.price FROM "
+                            "cars JOIN models ON cars.model_id = models.model_id WHERE cars.car_id IN "
+                            "(SELECT car_id FROM cars WHERE cars.year > 2019);")
+    table11_data = postgres_cursor.fetchall()
+
+    # Insert data into first table
+    for row in table11_data:
+        sqlite_cursor.execute(
+            "INSERT INTO cars(car_id, model, price) VALUES (?, ?, ?)", (row[0], row[1], row[2])
+        )
+    sqlite_conn.commit()
+
+    # Close connections
+    postgres_cursor.close()
+    postgres_conn.close()
+
+    print(sqlite_cursor.execute("SELECT * FROM cars").fetchall())
+    sqlite_cursor.close()
+    sqlite_conn.close()
+
+
 class AdminInterface:
     def __init__(self, master):
         self.master = master
@@ -107,6 +144,10 @@ class AdminInterface:
         transfer_db_button = Button(self.master, text="Transfer from MySQL to PostgreSQL", width=30, height=3,
                                     command=transfer_data_to_mysql)
         transfer_db_button.grid(row=1, column=2)
+
+        transfer_db_button = Button(self.master, text="Transfer from PostgreSQL to SQLite", width=30, height=3,
+                                    command=transfer_data_to_sqlite)
+        transfer_db_button.grid(row=0, column=2)
 
 
 root = Tk()
