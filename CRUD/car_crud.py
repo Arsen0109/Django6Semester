@@ -18,7 +18,7 @@ class Car:
 
 class CarDB:
     def __init__(self):
-        self.conn = mysql.connector.connect(host='localhost', user='root', password='@rsen2003', db='cartrademark')
+        self.conn = mysql.connector.connect(host='localhost', user='root', password='password', db='cartrademark')
         self.mysql_cursor = self.conn.cursor()
 
     def add_car(self, car):
@@ -66,6 +66,7 @@ class CarDB:
 class CarAdmin:
     def __init__(self, master):
         self.master = master
+        self.master['bg'] = 'green'
         self.master.title("Car Admin")
         self.car_listbox = tk.Listbox(self.master, width=40, height=20)
         self.year_entry = tk.Entry(self.master)
@@ -79,47 +80,48 @@ class CarAdmin:
         self.fill_car_listbox()
 
     def init_widgets(self):
-        tk.Label(self.master, text="Create car:", font="Arial 10 bold").grid(row=0, column=0)
-        make_label = tk.Label(self.master, text="Make:")
+        tk.Label(self.master, text="Створити авто:", font="Arial 10 bold", fg='white', bg='green').grid(row=0, column=0)
+        make_label = tk.Label(self.master, text="Марка:", fg='white', bg='green')
         make_label.grid(row=1, column=0)
         self.make_entry.grid(row=1, column=1)
 
-        model_label = tk.Label(self.master, text="Model_ID:")
+        model_label = tk.Label(self.master, text="ID моделі:", fg='white', bg='green')
         model_label.grid(row=2, column=0)
         self.model_id_entry.grid(row=2, column=1)
 
-        year_label = tk.Label(self.master, text="Year:")
+        year_label = tk.Label(self.master, text="Рік:", fg='white', bg='green')
         year_label.grid(row=3, column=0)
         self.year_entry.grid(row=3, column=1)
 
-        price_label = tk.Label(self.master, text="Price:")
+        price_label = tk.Label(self.master, text="Ціна:", fg='white', bg='green')
         price_label.grid(row=4, column=0)
         self.price_entry.grid(row=4, column=1)
 
-        trademark_label = tk.Label(self.master, text="Trademark_ID:")
+        trademark_label = tk.Label(self.master, text="ID компанії:", fg='white', bg='green')
         trademark_label.grid(row=5, column=0)
         self.trademark_id_entry.grid(row=5, column=1)
 
-        tk.Label(self.master, text="Get car by car_id", font="Arial 10 bold").grid(row=6, column=0)
-        tk.Label(self.master, text="Car ID:").grid(row=7, column=0)
+        tk.Label(self.master, text="Отримати авто за його id", font="Arial 10 bold", fg='white', bg='green')\
+            .grid(row=6, column=0)
+        tk.Label(self.master, text="Car ID:", fg='white', bg='green').grid(row=7, column=0)
         self.car_id_entry.grid(row=7, column=1)
 
         self.car_listbox.grid(row=8, column=0, columnspan=2)
         self.car_listbox.bind("<<ListboxSelect>>", self.on_select_car)
 
-        get_button = tk.Button(self.master, text="Get Car", command=self.show_car_by_id)
+        get_button = tk.Button(self.master, text="Отримати авто", command=self.show_car_by_id)
         get_button.grid(row=7, column=2)
 
-        add_button = tk.Button(self.master, text="Add", command=self.add_car)
+        add_button = tk.Button(self.master, text="Створити", command=self.add_car)
         add_button.grid(row=11, column=0)
 
-        update_button = tk.Button(self.master, text="Update", command=self.update_car)
+        update_button = tk.Button(self.master, text="Оновити", command=self.update_car)
         update_button.grid(row=11, column=1)
 
-        delete_button = tk.Button(self.master, text="Delete", command=self.delete_car)
+        delete_button = tk.Button(self.master, text="Видалити", command=self.delete_car)
         delete_button.grid(row=11, column=2)
 
-        clear_button = tk.Button(self.master, text="Clear", command=self.clear_form)
+        clear_button = tk.Button(self.master, text="Очистити", command=self.clear_form)
         clear_button.grid(row=11, column=3)
 
         self.info_label.grid(row=10, column=1)

@@ -14,7 +14,7 @@ class Trademark:
 
 class TrademarkDB:
     def __init__(self):
-        self.conn = mysql.connector.connect(host='localhost', user='root', password='@rsen2003', db='cartrademark')
+        self.conn = mysql.connector.connect(host='localhost', user='root', password='password', db='cartrademark')
         self.mysql_cursor = self.conn.cursor()
 
     def add_trademark(self, trademark):
@@ -54,7 +54,8 @@ class TrademarkDB:
 class TrademarkAdmin:
     def __init__(self, master):
         self.master = master
-        self.master.title("Car Admin")
+        self.master['bg'] = 'green'
+        self.master.title("Trademark Admin")
         self.trademark_listbox = tk.Listbox(self.master, width=40, height=20)
         self.trademark_entry = tk.Entry(self.master)
         self.trademark_id_entry = tk.Entry(self.master)
@@ -63,30 +64,30 @@ class TrademarkAdmin:
         self.fill_trademark_listbox()
 
     def init_widgets(self):
-        tk.Label(self.master, text="Trademark CRUD:", font="Arial 10 bold").grid(row=0, column=0)
+        tk.Label(self.master, text="CRUD для компаній:", font="Arial 10 bold", fg='white', bg='green').grid(row=0, column=0)
 
-        tk.Label(self.master, text="Trademark").grid(row=1, column=0)
+        tk.Label(self.master, text="Компанія", fg='white', bg='green').grid(row=1, column=0)
         self.trademark_entry.grid(row=1, column=1)
 
-        tk.Label(self.master, text="Trademark_ID").grid(row=2, column=0)
+        tk.Label(self.master, text="ID компанії", fg='white', bg='green').grid(row=2, column=0)
         self.trademark_id_entry.grid(row=2, column=1)
 
         self.trademark_listbox.grid(row=3, column=0, columnspan=2)
         self.trademark_listbox.bind("<<ListboxSelect>>", self.on_select_trademark)
 
-        get_button = tk.Button(self.master, text="Get trademark", command=self.show_trademark_by_id)
+        get_button = tk.Button(self.master, text="Отримати компанію", command=self.show_trademark_by_id)
         get_button.grid(row=2, column=2)
 
-        add_button = tk.Button(self.master, text="Add", command=self.add_trademark)
+        add_button = tk.Button(self.master, text="Створити", command=self.add_trademark)
         add_button.grid(row=6, column=0)
 
-        update_button = tk.Button(self.master, text="Update", command=self.update_trademark)
+        update_button = tk.Button(self.master, text="Оновити", command=self.update_trademark)
         update_button.grid(row=6, column=1)
 
-        delete_button = tk.Button(self.master, text="Delete", command=self.delete_trademark)
+        delete_button = tk.Button(self.master, text="Видалити", command=self.delete_trademark)
         delete_button.grid(row=6, column=2)
 
-        clear_button = tk.Button(self.master, text="Clear", command=self.clear_form)
+        clear_button = tk.Button(self.master, text="Очистити", command=self.clear_form)
         clear_button.grid(row=6, column=3)
 
         self.info_label.grid(row=5, column=1)

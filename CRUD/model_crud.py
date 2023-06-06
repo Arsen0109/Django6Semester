@@ -15,7 +15,7 @@ class Model:
 
 class ModelDB:
     def __init__(self):
-        self.conn = mysql.connector.connect(host='localhost', user='root', password='@rsen2003', db='cartrademark')
+        self.conn = mysql.connector.connect(host='localhost', user='root', password='password', db='cartrademark')
         self.mysql_cursor = self.conn.cursor()
 
     def add_model(self, model):
@@ -60,7 +60,8 @@ class ModelDB:
 class ModelAdmin:
     def __init__(self, master):
         self.master = master
-        self.master.title("Car Admin")
+        self.master['bg'] = 'green'
+        self.master.title("Model Admin")
         self.model_listbox = tk.Listbox(self.master, width=40, height=20)
         self.model_entry = tk.Entry(self.master)
         self.car_id_entry = tk.Entry(self.master)
@@ -70,33 +71,33 @@ class ModelAdmin:
         self.fill_model_listbox()
 
     def init_widgets(self):
-        tk.Label(self.master, text="Model CRUD:", font="Arial 10 bold").grid(row=0, column=0)
+        tk.Label(self.master, text="CRUD моделей:", font="Arial 10 bold", fg='white', bg='green').grid(row=0, column=0)
 
-        tk.Label(self.master, text="Model").grid(row=1, column=0)
+        tk.Label(self.master, text="Модель", fg='white', bg='green').grid(row=1, column=0)
         self.model_entry.grid(row=1, column=1)
 
-        tk.Label(self.master, text="Car_ID").grid(row=2, column=0)
+        tk.Label(self.master, text="ID авто", fg='white', bg='green').grid(row=2, column=0)
         self.car_id_entry.grid(row=2, column=1)
 
-        tk.Label(self.master, text="Model_ID").grid(row=3, column=0)
+        tk.Label(self.master, text="ID модель", fg='white', bg='green').grid(row=3, column=0)
         self.model_id_entry.grid(row=3, column=1)
 
         self.model_listbox.grid(row=4, column=0, columnspan=2)
         self.model_listbox.bind("<<ListboxSelect>>", self.on_select_model)
 
-        get_button = tk.Button(self.master, text="Get model", command=self.show_model_by_id)
+        get_button = tk.Button(self.master, text="Отримати модель", command=self.show_model_by_id)
         get_button.grid(row=3, column=2)
 
-        add_button = tk.Button(self.master, text="Add", command=self.add_model)
+        add_button = tk.Button(self.master, text="Створити", command=self.add_model)
         add_button.grid(row=7, column=0)
 
-        update_button = tk.Button(self.master, text="Update", command=self.update_model)
+        update_button = tk.Button(self.master, text="Оновити", command=self.update_model)
         update_button.grid(row=7, column=1)
 
-        delete_button = tk.Button(self.master, text="Delete", command=self.delete_model)
+        delete_button = tk.Button(self.master, text="Видалити", command=self.delete_model)
         delete_button.grid(row=7, column=2)
 
-        clear_button = tk.Button(self.master, text="Clear", command=self.clear_form)
+        clear_button = tk.Button(self.master, text="Очистити", command=self.clear_form)
         clear_button.grid(row=7, column=3)
 
         self.info_label.grid(row=6, column=1)

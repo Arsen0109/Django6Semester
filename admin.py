@@ -24,30 +24,23 @@ def call_model_crud():
 
 
 def transfer_data_to_mysql():
-    mysql_conn = mysql.connector.connect(host='localhost', user='root', password='@rsen2003', db='cartrademark')
+    mysql_conn = mysql.connector.connect(host='localhost', user='root', password='password', db='cartrademark')
     postgres_conn = psycopg2.connect(host='localhost', user='postgres', password='@rsen2003', dbname='cartrademarks')
 
-    # Retrieve data from MySQL tables
     mysql_cursor = mysql_conn.cursor()
 
-    # Retrieve data from first table
     mysql_cursor.execute("SELECT * FROM cartrademarks")
     table1_data = mysql_cursor.fetchall()
 
-    # Retrieve data from second table
     mysql_cursor.execute("SELECT * FROM cars")
     table2_data = mysql_cursor.fetchall()
 
-    # Retrieve data from third table
     mysql_cursor.execute("SELECT * FROM models")
     table3_data = mysql_cursor.fetchall()
 
-    # Insert data into PostgreSQL tables
     postgres_cursor = postgres_conn.cursor()
 
-    # print(table1_data)
     postgres_cursor.execute("TRUNCATE cartrademarks, cars, models")
-    # Insert data into first table
     for row in table1_data:
         postgres_cursor.execute(
             "INSERT INTO cartrademarks(trademark_id, trademark) VALUES (%s, %s)",
@@ -55,7 +48,6 @@ def transfer_data_to_mysql():
         )
     postgres_conn.commit()
 
-    # Insert data into second table
     for row in table2_data:
         postgres_cursor.execute(
             "INSERT INTO cars(car_id, make, year, price, trademark_id) VALUES (%s, %s, %s, %s, %s)",
@@ -63,7 +55,6 @@ def transfer_data_to_mysql():
         )
     postgres_conn.commit()
 
-    # Insert data into third table
     for row in table3_data:
         postgres_cursor.execute(
             "INSERT INTO models(model_id, model, car_id) VALUES (%s, %s, %s)",
@@ -71,14 +62,12 @@ def transfer_data_to_mysql():
         )
     postgres_conn.commit()
 
-    # Update cars table with foreign keys
     for row in table2_data:
         postgres_cursor.execute(
             f"UPDATE cars SET model_id={row[2]} WHERE car_id={row[0]}"
         )
     postgres_conn.commit()
 
-    # Close connections
     mysql_cursor.close()
     mysql_conn.close()
 
@@ -100,20 +89,17 @@ def transfer_data_to_sqlite():
                           "price INT)")
     sqlite_conn.commit()
 
-    # Retrieve data from tables and join it
     postgres_cursor.execute("SELECT cars.car_id, models.model, cars.price FROM "
                             "cars JOIN models ON cars.model_id = models.model_id WHERE cars.car_id IN "
                             "(SELECT car_id FROM cars WHERE cars.year > 2019);")
     table11_data = postgres_cursor.fetchall()
 
-    # Insert data into first table
     for row in table11_data:
         sqlite_cursor.execute(
             "INSERT INTO cars(car_id, model, price) VALUES (?, ?, ?)", (row[0], row[1], row[2])
         )
     sqlite_conn.commit()
 
-    # Close connections
     postgres_cursor.close()
     postgres_conn.close()
 
@@ -126,28 +112,31 @@ class AdminInterface:
     def __init__(self, master):
         self.master = master
         self.master.title("Car Admin")
+        self.master["bg"] = 'blue'
         self.init_widgets()
 
     def init_widgets(self):
-        car_interface_button = Button(self.master, text="Car CRUD interface", command=call_car_crud,
-                                      width=20, height=3)
-        car_interface_button.grid(row=0, column=0)
+        Label(self.master, text='Головна сторінка', font='Arial 24', bg='yellow').grid(row=0, column=1)
 
-        trademark_interface_button = Button(self.master, text="Trademark CRUD interface", width=20, height=3,
-                                            command=call_trademark_crud)
-        trademark_interface_button.grid(row=1, column=0)
+        car_interface_button = Button(self.master, text="Операції CRUD з авто", command=call_car_crud, height=2,
+                                      bg='yellow')
+        car_interface_button.grid(row=1, column=0)
 
-        model_interface_button = Button(self.master, text="Model CRUD interface", width=20, height=3,
-                                        command=call_model_crud)
-        model_interface_button.grid(row=2, column=0)
+        trademark_interface_button = Button(self.master, text="Операції CRUD з компаніями", height=2,
+                                            command=call_trademark_crud, bg='yellow')
+        trademark_interface_button.grid(row=1, column=1)
 
-        transfer_db_button = Button(self.master, text="Transfer from MySQL to PostgreSQL", width=30, height=3,
-                                    command=transfer_data_to_mysql)
-        transfer_db_button.grid(row=1, column=2)
+        model_interface_button = Button(self.master, text="Операції CRUD з моделями авто", height=2,
+                                        command=call_model_crud, bg='yellow')
+        model_interface_button.grid(row=1, column=2)
 
-        transfer_db_button = Button(self.master, text="Transfer from PostgreSQL to SQLite", width=30, height=3,
-                                    command=transfer_data_to_sqlite)
-        transfer_db_button.grid(row=0, column=2)
+        transfer_db_button = Button(self.master, text="Перенести дані з MySQL до PostgreSQL", height=2,
+                                    command=transfer_data_to_mysql, bg='yellow')
+        transfer_db_button.grid(row=2, column=0)
+
+        transfer_db_button = Button(self.master, text="Перенести дані з PostgreSQL до SQLite", height=2,
+                                    command=transfer_data_to_sqlite, bg='yellow')
+        transfer_db_button.grid(row=2, column=2)
 
 
 root = Tk()
